@@ -265,7 +265,15 @@ module tt_um_rejunity_atari2600 (
   //     tia_vsync_last <= tia_vsync;
   //   end
 
-  wire [6:0] hue_luma = vga_xpos < 640 ? scanline[vga_xpos / 4] : 0;
+  //wire [6:0] hue_luma = vga_xpos < 640 ? scanline[vga_xpos / 4] : 0;
+  reg [6:0] hue_luma;
+
+  always @(*)
+    if (vga_xpos[9:2] < 160)
+      hue_luma = scanline[vga_xpos[9:2]];
+    else
+      hue_luma = 0;
+
   wire [3:0] hue = hue_luma[6:3];
   wire [3:0] luma = {hue_luma[2:0], 1'b0};
   wire [23:0] rgb_24bpp;
@@ -395,11 +403,14 @@ module tt_um_rejunity_atari2600 (
   wire pia_cs = (address_bus[12] == 0 && address_bus[7] == 1 && address_bus[9] == 1);
   wire ram_cs = (address_bus[12] == 0 && address_bus[7] == 1 && address_bus[9] == 0);
 
-  reg [7:0] rom_data;
+  reg [11:0] rom_addr;
+  wire [7:0] rom_data_raw;
+  reg  [7:0] rom_data;
+
   always @(posedge clk) begin
     // ROM
-    rom_data <= rom[address_bus[11:0]]; // makes yosys iCE40 BRAM inference happy
-                                        // and allows it to be used as ROM storage
+    rom_addr <= address_bus[11:0];
+    rom_data <= rom_data_raw;
 
     // CPU writes
     if (cpu_enable && write_enable && ram_cs) ram[address_bus[6:0]] <= data_out;
@@ -410,4 +421,10 @@ module tt_um_rejunity_atari2600 (
     if (tia_cs) data_in <= tia_data_out;
     if (pia_cs) data_in <= pia_data_out;
   end
+
+  rom_2600 rom_I (
+    .addr (rom_addr),
+    .q    (rom_data_raw)
+  );
+
 endmodule

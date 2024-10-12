@@ -36,6 +36,8 @@
   "//": "RUN_LINTER, LINTER_INCLUDE_PDK_MODELS - Disabling the linter is not recommended!",
   "RUN_LINTER": 1,
   "LINTER_INCLUDE_PDK_MODELS": 1,
+  "QUIT_ON_SYNTH_CHECKS": 0,
+  "QUIT_ON_VERILATOR_ERRORS": 0,
 
   "//": "If you need a custom clock configuration, read the following documentation first:",
   "//": "https://tinytapeout.com/faq/#how-can-i-map-an-additional-external-clock-to-one-of-the-gpios",
@@ -90,5 +92,27 @@
   "MAGIC_DEF_LABELS": 0,
 
   "//": "Only export pin area in LEF (without any connected nets)",
-  "MAGIC_WRITE_LEF_PINONLY": 1
+  "MAGIC_WRITE_LEF_PINONLY": 1,
+
+  "//": "Macro",
+  "MACROS": {
+   "rom_2600": {
+    "instances" : {
+     "rom_I" : {
+       "location": [880, 50],
+       "orientation": "FN"
+     }
+    },
+    "gds": ["dir::../macro/rom_2600.gds"],
+    "lef": ["dir::../macro/rom_2600.lef"],
+    "lib": {
+        "*": ["dir::../macro/rom_2600.lib"]
+    }
+   }
+  },
+
+  "//": "Macro power",
+  "FP_PDN_HORIZONTAL_LAYER": "met3",
+  "FP_MACRO_HORIZONTAL_HALO": "6",
+  "FP_MACRO_VERTICAL_HALO": "2"
 }
