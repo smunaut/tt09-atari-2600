@@ -404,13 +404,14 @@ module tt_um_rejunity_atari2600 (
   wire ram_cs = (address_bus[12] == 0 && address_bus[7] == 1 && address_bus[9] == 0);
 
   reg [11:0] rom_addr;
-  wire [7:0] rom_data_raw;
+  wire [7:0] rom_data_raw0;
+  wire [7:0] rom_data_raw1;
   reg  [7:0] rom_data;
 
   always @(posedge clk) begin
     // ROM
     rom_addr <= address_bus[11:0];
-    rom_data <= rom_data_raw;
+    rom_data <= ui_in[7] ? rom_data_raw1 : rom_data_raw0;
 
     // CPU writes
     if (cpu_enable && write_enable && ram_cs) ram[address_bus[6:0]] <= data_out;
@@ -422,9 +423,14 @@ module tt_um_rejunity_atari2600 (
     if (pia_cs) data_in <= pia_data_out;
   end
 
-  rom_2600 rom_I (
+  rom_2600 rom0_I (
     .addr (rom_addr),
-    .q    (rom_data_raw)
+    .q    (rom_data_raw0)
+  );
+
+  rom_2600 rom1_I (
+    .addr (rom_addr),
+    .q    (rom_data_raw1)
   );
 
 endmodule
